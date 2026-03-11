@@ -90,7 +90,7 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	// Sort by Trs descending
 	sort.Slice(txns, func(i, j int) bool { return txns[i].Trs > txns[j].Trs })
 
-	var totalInc, totalExp float64
+	var totalInc, totalExp, cashIn, cashOut, bankDep float64
 	yearMap := map[string]*YearlySummary{}
 	shIncome := map[string]float64{"ammi": 0, "alka": 0, "jahanzeb": 0, "memoona": 0, "waleed": 0}
 	shExpense := map[string]float64{"ammi": 0, "alka": 0, "jahanzeb": 0, "memoona": 0, "waleed": 0}
@@ -104,6 +104,12 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 			yearMap[year] = &YearlySummary{Year: year}
 		}
 
+		// BANK DEPOSIT (ac=100) counts as bank deposit reducing cash on hand
+		if t.Ac == 100 {
+			bankDep += t.Amount
+			continue
+		}
+
 		if t.IncomeExpense == "income" {
 			totalInc += t.Amount
 			yearMap[year].Income += t.Amount
@@ -112,6 +118,9 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 			shIncome["jahanzeb"] += t.Jahanzeb
 			shIncome["memoona"] += t.Memoona
 			shIncome["waleed"] += t.Waleed
+			if t.CashCredit == "Cash" {
+				cashIn += t.Amount
+			}
 		} else {
 			totalExp += t.Amount
 			yearMap[year].Expense += t.Amount
@@ -120,6 +129,9 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 			shExpense["jahanzeb"] += t.Jahanzeb
 			shExpense["memoona"] += t.Memoona
 			shExpense["waleed"] += t.Waleed
+			if t.CashCredit == "Cash" {
+				cashOut += t.Amount
+			}
 		}
 	}
 
@@ -166,7 +178,7 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	report := ReportsResponse{
 		TotalIncome:     round2(totalInc),
 		TotalExpense:    round2(totalExp),
-		CashOnHand:      round2(totalInc - totalExp),
+		CashOnHand:      round2(cashIn - cashOut - bankDep),
 		TxnCount:        len(txns),
 		Last10:          last10,
 		Shareholders:    shBalances,

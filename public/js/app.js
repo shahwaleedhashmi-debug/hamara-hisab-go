@@ -92,12 +92,18 @@ async function boot() {
 
 // ── HOME ──
 function initHome() {
-  let income = 0, expense = 0;
+  let income = 0, expense = 0, cashIn = 0, cashOut = 0, bankDep = 0;
   allTxns.forEach(t => {
-    if (t.income_expense === 'income') income += t.amount;
-    else expense += t.amount;
+    if (t.ac === 100) { bankDep += t.amount; return; }
+    if (t.income_expense === 'income') {
+      income += t.amount;
+      if (t.cash_credit === 'Cash') cashIn += t.amount;
+    } else {
+      expense += t.amount;
+      if (t.cash_credit === 'Cash') cashOut += t.amount;
+    }
   });
-  const cash = income - expense;
+  const cash = cashIn - cashOut - bankDep;
 
   const el = document.getElementById('home-balance');
   el.textContent = fmtFull(Math.abs(cash));
@@ -395,7 +401,7 @@ async function initReports() {
 
 function renderReports(r) {
   const body = document.getElementById('reports-body');
-  const cash = r.total_income - r.total_expense;
+  const cash = r.cash_on_hand;
 
   const last10HTML = (r.last_10 || []).map(t => {
     const isInc = t.income_expense === 'income';
@@ -529,14 +535,20 @@ async function saveDeposit() {
 
 // ── ADMIN ──
 function initAdmin() {
-  let income = 0, expense = 0;
+  let income = 0, expense = 0, cashIn = 0, cashOut = 0, bankDep = 0;
   allTxns.forEach(t => {
-    if (t.income_expense === 'income') income += t.amount;
-    else expense += t.amount;
+    if (t.ac === 100) { bankDep += t.amount; return; }
+    if (t.income_expense === 'income') {
+      income += t.amount;
+      if (t.cash_credit === 'Cash') cashIn += t.amount;
+    } else {
+      expense += t.amount;
+      if (t.cash_credit === 'Cash') cashOut += t.amount;
+    }
   });
   document.getElementById('admin-income').textContent  = fmt(income);
   document.getElementById('admin-expense').textContent = fmt(expense);
-  document.getElementById('admin-cash').textContent    = fmt(income - expense);
+  document.getElementById('admin-cash').textContent    = fmt(cashIn - cashOut - bankDep);
   document.getElementById('admin-count').textContent   = allTxns.length;
 }
 
