@@ -35,14 +35,14 @@ var shareholders = []Shareholder{
 type Transaction struct {
 	ID               interface{} `json:"id,omitempty"`
 	FirebaseKey      string      `json:"firebase_key,omitempty"`
-	Trs              int         `json:"trs"`
+	Trs              *int64      `json:"trs"`
 	Tstamp           string      `json:"tstamp"`
 	Des              string      `json:"des"`
 	Amount           float64     `json:"amount"`
 	Ac               int         `json:"ac"`
 	IncomeExpense    string      `json:"income_expense"`
 	CashCredit       string      `json:"cash_credit"`
-	CommonIndividual string      `json:"common_individual"`
+	CommonIndividual interface{} `json:"common_individual"`
 	Ammi             float64     `json:"ammi"`
 	Alka             float64     `json:"alka"`
 	Jahanzeb         float64     `json:"jahanzeb"`
@@ -157,7 +157,7 @@ func handlePost(body string) (events.APIGatewayProxyResponse, error) {
 	ammi, alka, jahanzeb, memoona, waleed := calcSplit(req.Amount, req.CommonIndividual)
 
 	txn := Transaction{
-		Trs:              int(time.Now().UnixMilli()),
+		Trs:              func() *int64 { v := time.Now().UnixMilli(); return &v }(),
 		Tstamp:           time.Now().Format("2006-01-02 15:04:05"),
 		Des:              req.Des,
 		Amount:           req.Amount,

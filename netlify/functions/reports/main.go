@@ -16,20 +16,20 @@ import (
 const firebaseURL = "https://shah-hisab-default-rtdb.firebaseio.com"
 
 type Transaction struct {
-	FirebaseKey      string  `json:"firebase_key,omitempty"`
-	Trs              int64   `json:"trs"`
-	Tstamp           string  `json:"tstamp"`
-	Des              string  `json:"des"`
-	Amount           float64 `json:"amount"`
-	Ac               int     `json:"ac"`
-	IncomeExpense    string  `json:"income_expense"`
-	CashCredit       string  `json:"cash_credit"`
-	CommonIndividual string  `json:"common_individual"`
-	Ammi             float64 `json:"ammi"`
-	Alka             float64 `json:"alka"`
-	Jahanzeb         float64 `json:"jahanzeb"`
-	Memoona          float64 `json:"memoona"`
-	Waleed           float64 `json:"waleed"`
+	FirebaseKey      string      `json:"firebase_key,omitempty"`
+	Trs              *int64      `json:"trs"`
+	Tstamp           string      `json:"tstamp"`
+	Des              string      `json:"des"`
+	Amount           float64     `json:"amount"`
+	Ac               int         `json:"ac"`
+	IncomeExpense    string      `json:"income_expense"`
+	CashCredit       string      `json:"cash_credit"`
+	CommonIndividual interface{} `json:"common_individual"`
+	Ammi             float64     `json:"ammi"`
+	Alka             float64     `json:"alka"`
+	Jahanzeb         float64     `json:"jahanzeb"`
+	Memoona          float64     `json:"memoona"`
+	Waleed           float64     `json:"waleed"`
 }
 
 type ShareholderBalance struct {
@@ -87,8 +87,14 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 		deposits = map[string]map[string]float64{}
 	}
 
-	// Sort by Trs descending
-	sort.Slice(txns, func(i, j int) bool { return txns[i].Trs > txns[j].Trs })
+	// Sort by Trs descending (nil trs treated as 0)
+	trsVal := func(t Transaction) int64 {
+		if t.Trs == nil {
+			return 0
+		}
+		return *t.Trs
+	}
+	sort.Slice(txns, func(i, j int) bool { return trsVal(txns[i]) > trsVal(txns[j]) })
 
 	var totalInc, totalExp, cashIn, cashOut, bankDep float64
 	yearMap := map[string]*YearlySummary{}
