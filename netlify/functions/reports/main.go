@@ -195,8 +195,8 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	return events.APIGatewayProxyResponse{StatusCode: 200, Headers: corsHeaders(), Body: string(out)}, nil
 }
 
-func fetchTxns() ([]Transaction, error) {
-	resp, err := http.Get(firebaseURL + "/txns.json")
+func fetchFromPath(path string) ([]Transaction, error) {
+	resp, err := http.Get(firebaseURL + path)
 	if err != nil {
 		return nil, fmt.Errorf("firebase fetch failed: %w", err)
 	}
@@ -207,7 +207,6 @@ func fetchTxns() ([]Transaction, error) {
 	if err := json.Unmarshal(body, &rawMap); err != nil || rawMap == nil {
 		return []Transaction{}, nil
 	}
-
 	txns := make([]Transaction, 0, len(rawMap))
 	for key, val := range rawMap {
 		var t Transaction
@@ -217,6 +216,15 @@ func fetchTxns() ([]Transaction, error) {
 		}
 	}
 	return txns, nil
+}
+
+func fetchTxns() ([]Transaction, error) {
+	history, _ := fetchFromPath("/txns_history.json")
+	live, err := fetchFromPath("/txns.json")
+	if err != nil {
+		return nil, err
+	}
+	return append(history, live...), nil
 }
 
 func fetchDeposits() (map[string]map[string]float64, error) {

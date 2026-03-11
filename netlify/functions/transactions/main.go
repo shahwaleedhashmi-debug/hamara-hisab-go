@@ -121,20 +121,18 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	return events.APIGatewayProxyResponse{StatusCode: 405, Headers: corsHeaders(), Body: `{"error":"method not allowed"}`}, nil
 }
 
-func handleGet() (events.APIGatewayProxyResponse, error) {
-	resp, err := http.Get(firebaseURL + "/txns.json")
+func fetchFirebaseTxns(path string) ([]Transaction, error) {
+	resp, err := http.Get(firebaseURL + path)
 	if err != nil {
-		return errResp(500, "firebase fetch failed: "+err.Error()), nil
+		return nil, err
 	}
 	defer resp.Body.Close()
 	body, _ := io.ReadAll(resp.Body)
 
-	// Firebase returns a map of key→txn; convert to array
 	var rawMap map[string]json.RawMessage
 	if err := json.Unmarshal(body, &rawMap); err != nil || rawMap == nil {
-		return events.APIGatewayProxyResponse{StatusCode: 200, Headers: corsHeaders(), Body: "[]"}, nil
+		return []Transaction{}, nil
 	}
-
 	txns := make([]Transaction, 0, len(rawMap))
 	for key, val := range rawMap {
 		var t Transaction
@@ -143,6 +141,17 @@ func handleGet() (events.APIGatewayProxyResponse, error) {
 			txns = append(txns, t)
 		}
 	}
+	return txns, nil
+}
+
+func handleGet() (events.APIGatewayProxyResponse, error) {
+	// Fetch historical (embedded) + live Firebase transactions
+	history, _ := fetchFirebaseTxns("/txns_history.json")
+	live, err := fetchFirebaseTxns("/txns.json")
+	if err != nil {
+		return errResp(500, "firebase fetch failed: "+err.Error()), nil
+	}
+	txns := append(history, live...)
 
 	out, _ := json.Marshal(txns)
 	return events.APIGatewayProxyResponse{StatusCode: 200, Headers: corsHeaders(), Body: string(out)}, nil
