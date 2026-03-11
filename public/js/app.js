@@ -16,11 +16,9 @@ const wData = { amount: 0, des: '', ac: 0, incomeExpense: '', cashCredit: '', co
 
 // ── FORMATTING ──
 function fmt(n) {
-  n = Math.abs(n);
-  if (n >= 1e7) return 'Rs.' + (n / 1e7).toFixed(2) + ' Cr';
-  if (n >= 1e5) return 'Rs.' + (n / 1e5).toFixed(2) + ' L';
-  if (n >= 1e3) return 'Rs.' + (n / 1e3).toFixed(1) + 'K';
-  return 'Rs.' + n.toFixed(0);
+  const abs = Math.abs(n);
+  const s = abs.toFixed(0).replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return (n < 0 ? '-' : '') + 'Rs.' + s;
 }
 function fmtFull(n) {
   const abs = Math.abs(n);
