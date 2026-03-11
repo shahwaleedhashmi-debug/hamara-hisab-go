@@ -195,8 +195,9 @@ function selectAccount(ac, el) {
 function buildShareList() {
   // Step 5: choose split scheme (A, B) or individual (1-5)
   const opts = [
-    { val: 'A', label: 'Equal Split (A)', desc: '20% each' },
-    { val: 'B', label: 'Weighted (B)', desc: 'Ammi/Alka/Waleed 25%, others 12.5%' },
+    { val: 'A', label: 'Scheme A', desc: 'Ammi/Jahanzeb/Waleed 25%, Alka/Memoona 12.5%' },
+    { val: 'B', label: 'Scheme B', desc: 'Ammi 12.4%, Alka/Memoona 14.6%, Jahanzeb/Waleed 29.2%' },
+    { val: 'C', label: 'Scheme C', desc: 'Jahanzeb 50%, Waleed 50%' },
   ].concat(appData.shareholders.map(sh => ({ val: String(sh.id), label: sh.name, desc: 'Individual' })));
 
   document.getElementById('share-list').innerHTML = opts.map(o => `
@@ -245,8 +246,9 @@ function buildConfirm() {
 }
 
 function ciLabel(ci) {
-  if (ci === 'A') return 'Equal Split (A)';
-  if (ci === 'B') return 'Weighted (B)';
+  if (ci === 'A') return 'Scheme A';
+  if (ci === 'B') return 'Scheme B';
+  if (ci === 'C') return 'Scheme C';
   const sh = appData.shareholders.find(s => String(s.id) === ci);
   return sh ? sh.name : ci;
 }
@@ -254,11 +256,16 @@ function ciLabel(ci) {
 function calcSplit(amount, ci) {
   const result = {};
   appData.shareholders.forEach(sh => result[sh.name.toLowerCase()] = 0);
+  const r = v => Math.round(amount * v * 100) / 100;
   if (ci === 'A') {
-    appData.shareholders.forEach(sh => result[sh.name.toLowerCase()] = Math.round(amount * 0.20 * 100) / 100);
+    // Ammi 25%, Alka 12.5%, Jahanzeb 25%, Memoona 12.5%, Waleed 25%
+    Object.assign(result, { ammi: r(0.25), alka: r(0.125), jahanzeb: r(0.25), memoona: r(0.125), waleed: r(0.25) });
   } else if (ci === 'B') {
-    const shares = { ammi: 0.25, alka: 0.25, jahanzeb: 0.125, memoona: 0.125, waleed: 0.25 };
-    Object.entries(shares).forEach(([k, v]) => result[k] = Math.round(amount * v * 100) / 100);
+    // Ammi 12.4%, Alka 14.6%, Jahanzeb 29.2%, Memoona 14.6%, Waleed 29.2%
+    Object.assign(result, { ammi: r(0.124), alka: r(0.146), jahanzeb: r(0.292), memoona: r(0.146), waleed: r(0.292) });
+  } else if (ci === 'C') {
+    // Jahanzeb 50%, Waleed 50%
+    Object.assign(result, { jahanzeb: r(0.5), waleed: r(0.5) });
   } else {
     const sh = appData.shareholders.find(s => String(s.id) === ci);
     if (sh) result[sh.name.toLowerCase()] = amount;

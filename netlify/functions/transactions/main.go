@@ -21,14 +21,15 @@ type Shareholder struct {
 	Name   string  `json:"name"`
 	ShareA float64 `json:"share_a"`
 	ShareB float64 `json:"share_b"`
+	ShareC float64 `json:"share_c"`
 }
 
 var shareholders = []Shareholder{
-	{1, "ammi", 0.20, 0.25},
-	{2, "alka", 0.20, 0.25},
-	{3, "jahanzeb", 0.20, 0.125},
-	{4, "memoona", 0.20, 0.125},
-	{5, "waleed", 0.20, 0.25},
+	{1, "ammi", 0.25, 0.124, 0},
+	{2, "alka", 0.125, 0.146, 0},
+	{3, "jahanzeb", 0.25, 0.292, 0.5},
+	{4, "memoona", 0.125, 0.146, 0},
+	{5, "waleed", 0.25, 0.292, 0.5},
 }
 
 type Transaction struct {
@@ -65,17 +66,23 @@ func round2(v float64) float64 {
 func calcSplit(amount float64, ci string) (ammi, alka, jahanzeb, memoona, waleed float64) {
 	switch ci {
 	case "A":
-		ammi = round2(amount * 0.20)
-		alka = round2(amount * 0.20)
-		jahanzeb = round2(amount * 0.20)
-		memoona = round2(amount * 0.20)
-		waleed = round2(amount * 0.20)
-	case "B":
+		// Equal split: Ammi 25%, Alka 12.5%, Jahanzeb 25%, Memoona 12.5%, Waleed 25%
 		ammi = round2(amount * 0.25)
-		alka = round2(amount * 0.25)
-		jahanzeb = round2(amount * 0.125)
+		alka = round2(amount * 0.125)
+		jahanzeb = round2(amount * 0.25)
 		memoona = round2(amount * 0.125)
 		waleed = round2(amount * 0.25)
+	case "B":
+		// B split: Ammi 12.4%, Alka 14.6%, Jahanzeb 29.2%, Memoona 14.6%, Waleed 29.2%
+		ammi = round2(amount * 0.124)
+		alka = round2(amount * 0.146)
+		jahanzeb = round2(amount * 0.292)
+		memoona = round2(amount * 0.146)
+		waleed = round2(amount * 0.292)
+	case "C":
+		// C split: Jahanzeb 50%, Waleed 50%
+		jahanzeb = round2(amount * 0.5)
+		waleed = round2(amount * 0.5)
 	case "1":
 		ammi = amount
 	case "2":
