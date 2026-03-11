@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ہمارا حساب</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- ══ HOME ══ -->
+<div class="page active" id="page-home">
+  <div class="home-hero">
+    <div class="home-logo">ہمارا حساب</div>
+    <div class="home-subtitle">Financial Transaction Management</div>
+  </div>
+  <div class="balance-card">
+    <div class="balance-label">Cash on Hand</div>
+    <div class="balance-amount pos" id="home-balance">Rs.0</div>
+    <div class="balance-sub" id="home-txncount">Loading…</div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-chip income">
+      <div class="label">Total Income</div>
+      <div class="value" id="home-income">—</div>
+    </div>
+    <div class="stat-chip expense">
+      <div class="label">Total Expense</div>
+      <div class="value" id="home-expense">—</div>
+    </div>
+  </div>
+  <div class="quick-actions">
+    <button class="action-btn blue" onclick="gotoAdd()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      Add Transaction
+      <svg class="btn-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <button class="action-btn green" onclick="nav('deposit')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+      Bank Deposit
+      <svg class="btn-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <button class="action-btn teal" onclick="nav('reports')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      Reports
+      <svg class="btn-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ══ ADD TRANSACTION ══ -->
+<div class="page" id="page-add">
+  <div class="wizard-header">
+    <h2>Add Transaction</h2>
+    <p>Step by step — takes 30 seconds</p>
+    <div class="progress-bar">
+      <div class="progress-step active" id="prog-1"></div>
+      <div class="progress-step" id="prog-2"></div>
+      <div class="progress-step" id="prog-3"></div>
+      <div class="progress-step" id="prog-4"></div>
+      <div class="progress-step" id="prog-5"></div>
+      <div class="progress-step" id="prog-6"></div>
+      <div class="progress-step" id="prog-7"></div>
+    </div>
+  </div>
+
+  <!-- Step 1: Amount -->
+  <div class="w-step wizard-body" id="w-step-1">
+    <div class="wizard-card">
+      <div class="amount-wrap">
+        <div class="amount-label">Amount (Rs.)</div>
+        <input class="amount-field" id="w-amount" type="number" inputmode="decimal"
+               min="0" step="1" placeholder="0.00"
+               oninput="wData.amount=parseFloat(this.value)||0; updateNextBtn(1)">
+        <div class="currency-hint">Enter amount in Pakistani Rupees</div>
+      </div>
+    </div>
+    <div class="wizard-btns">
+      <button class="wbtn wbtn-back" onclick="nav('home')">← Back</button>
+      <button class="wbtn wbtn-next" id="w-next-1" disabled onclick="wNext(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Income / Expense -->
+  <div class="w-step wizard-body" id="w-step-2" style="display:none">
+    <div class="wizard-card">
+      <h3>Transaction Type</h3>
+      <div class="option-grid cols-2">
+        <div class="option-card" data-group="ie" onclick="selectOpt('ie','income',this)">
+          <div class="option-radio"></div>
+          <div class="option-text">
+            <div class="option-title">💰 Income</div>
+            <div class="option-desc">Money received</div>
+          </div>
+        </div>
+        <div class="option-card" data-group="ie" onclick="selectOpt('ie','expense',this)">
+          <div class="option-radio"></div>
+          <div class="option-text">
+            <div class="option-title">💸 Expense</div>
+            <div class="option-desc">Money spent</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wizard-btns">
+      <button class="wbtn wbtn-back" onclick="wBack(1)">← Back</button>
+      <button class="wbtn wbtn-next" id="w-next-2" disabled onclick="wNext(3)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Cash / Credit -->
+  <div class="w-step wizard-body" id="w-step-3" style="display:none">
+    <div class="wizard-card">
+      <h3>Payment Method</h3>
+      <div class="option-grid cols-2">
+        <div class="option-card" data-group="cc" onclick="selectOpt('cc','Cash',this)">
+          <div class="option-radio"></div>
+          <div class="option-text">
+            <div class="option-title">💵 Cash</div>
+            <div class="option-desc">Physical money</div>
+          </div>
+        </div>
+        <div class="option-card" data-group="cc" onclick="selectOpt('cc','Credit',this)">
+          <div class="option-radio"></div>
+          <div class="option-text">
+            <div class="option-title">🏦 Credit</div>
+            <div class="option-desc">Bank / transfer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wizard-btns">
+      <button class="wbtn wbtn-back" onclick="wBack(2)">← Back</button>
+      <button class="wbtn wbtn-next" id="w-next-3" disabled onclick="wNext(4)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Account -->
+  <div class="w-step wizard-body" id="w-step-4" style="display:none">
+    <div class="wizard-card">
+      <h3>Select Account</h3>
+      <div class="account-list" id="account-list"></div>
+    </div>
+    <div class="wizard-btns">
+      <button class="wbtn wbtn-back" onclick="wBack(3)">← Back</button>
+      <button class="wbtn wbtn-next" id="w-next-4" disabled onclick="wNext(5)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 5: Split -->
+  <div class="w-step wizard-body" id="w-step-5" style="display:none">
+    <div class="wizard-card">
+      <h3>How to Split?</h3>
+      <div class="option-grid" id="share-list"></div>
+    </div>
+    <div class="wizard-btns">
+      <button class="wbtn wbtn-back" onclick="wBack(4)">← Back</button>
+      <button class="wbtn wbtn-next" id="w-next-5" disabled onclick="wNext(6)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 6: Description -->
+  <div class="w-step wizard-body" id="w-step-6" style="display:none">
+    <div class="wizard-card">
+      <h3>Description</h3>
+      <input class="desc-field" id="w-desc-input" type="text" placeholder="e.g. Monthly grocery shopping…"
+             oninput="wData.des=this.value; updateNextBtn(6)">
+    </div>
+    <div class="wizard-btns">
+      <button class="wbtn wbtn-back" onclick="wBack(5)">← Back</button>
+      <button class="wbtn wbtn-next" id="w-next-6" disabled onclick="wNext(7)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 7: Confirm -->
+  <div class="w-step wizard-body" id="w-step-7" style="display:none">
+    <div class="wizard-card">
+      <h3>Review & Confirm</h3>
+      <div style="text-align:center;margin-bottom:16px">
+        <div id="conf-amount" class="confirm-amount">Rs.0</div>
+      </div>
+      <table class="confirm-table">
+        <tr><td>Account</td><td id="conf-ac">—</td></tr>
+        <tr><td>Type</td><td id="conf-type">—</td></tr>
+        <tr><td>Method</td><td id="conf-cc">—</td></tr>
+        <tr><td>Split</td><td id="conf-ci">—</td></tr>
+        <tr><td>Description</td><td id="conf-des">—</td></tr>
+      </table>
+      <table class="splits-table" style="margin-top:14px">
+        <thead><tr><th>Person</th><th style="text-align:right">Share</th></tr></thead>
+        <tbody id="conf-splits"></tbody>
+      </table>
+    </div>
+    <div class="wizard-btns">
+      <button class="wbtn wbtn-back" onclick="wBack(6)">← Edit</button>
+      <button class="wbtn wbtn-submit" id="w-submit-btn" onclick="submitWizard()">Submit ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TRANSACTIONS ══ -->
+<div class="page" id="page-txns">
+  <div class="page-header">
+    <h1>Transactions</h1>
+    <p>All recorded transactions</p>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-pill active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-pill" onclick="setFilter('income',this)">Income</button>
+    <button class="filter-pill" onclick="setFilter('expense',this)">Expense</button>
+    <button class="filter-pill" onclick="setFilter('bank',this)">Bank</button>
+  </div>
+  <div class="search-wrap">
+    <input class="search-input" id="txn-search" type="text" placeholder="Search description or account…"
+           oninput="txnSearch(this.value)">
+  </div>
+  <div class="txn-list" id="txn-list"></div>
+  <div class="pagination">
+    <button class="page-btn" id="txn-prev" onclick="txnChangePage(-1)">← Prev</button>
+    <span class="page-info" id="txn-page-info">Page 1</span>
+    <button class="page-btn" id="txn-next" onclick="txnChangePage(1)">Next →</button>
+  </div>
+</div>
+
+<!-- ══ REPORTS ══ -->
+<div class="page" id="page-reports">
+  <div class="page-header">
+    <h1>Reports</h1>
+    <p>Financial summary & analysis</p>
+  </div>
+  <div class="reports-body" id="reports-body">
+    <div style="text-align:center;padding:40px"><span class="spinner dark"></span></div>
+  </div>
+</div>
+
+<!-- ══ DEPOSIT ══ -->
+<div class="page" id="page-deposit">
+  <div class="page-header">
+    <h1>Bank Deposit</h1>
+    <p>Record deposits per shareholder</p>
+  </div>
+  <div class="deposit-body">
+    <div class="deposit-card">
+      <div class="dep-header">
+        <h2>🏦 Enter Deposit Amounts</h2>
+        <p>Enter each person's deposit for this period</p>
+      </div>
+      <div id="deposit-rows"></div>
+      <div class="dep-total-row">
+        <span class="dep-total-label">Total Deposit</span>
+        <span class="dep-total-val" id="dep-total">Rs.0</span>
+      </div>
+    </div>
+    <button class="dep-btn" id="dep-save-btn" onclick="saveDeposit()">Save Deposit</button>
+  </div>
+</div>
+
+<!-- ══ ADMIN ══ -->
+<div class="page" id="page-admin">
+  <div class="page-header">
+    <h1>Admin</h1>
+    <p>Data management & export</p>
+  </div>
+  <div class="admin-body">
+    <div class="admin-card">
+      <div class="admin-card-hdr">📊 Database Stats</div>
+      <div class="admin-card-body">
+        <div class="stat-grid">
+          <div class="stat-box"><div class="s-label">Income</div><div class="s-val" style="color:var(--success)" id="admin-income">—</div></div>
+          <div class="stat-box"><div class="s-label">Expense</div><div class="s-val" style="color:var(--danger)" id="admin-expense">—</div></div>
+          <div class="stat-box"><div class="s-label">Cash</div><div class="s-val" style="color:var(--primary)" id="admin-cash">—</div></div>
+          <div class="stat-box"><div class="s-label">Transactions</div><div class="s-val" id="admin-count">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-hdr">🔧 Tools</div>
+      <div class="admin-card-body">
+        <div class="admin-btn-row">
+          <button class="admin-btn blue" onclick="refreshTxns()">↻ Refresh Data</button>
+          <button class="admin-btn green" onclick="exportCSV()">↓ Export CSV</button>
+        </div>
+      </div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-hdr">ℹ️ About</div>
+      <div class="admin-card-body" style="font-size:0.82rem;color:var(--gray-500);line-height:1.6">
+        <p><strong>ہمارا حساب</strong> — Financial Transaction Management</p>
+        <p style="margin-top:6px">Backend: Go (Netlify Functions)</p>
+        <p>Database: Firebase Realtime Database</p>
+        <p>Version: 2.0</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BOTTOM NAV ══ -->
+<nav class="bottom-nav">
+  <button class="nav-item active" data-page="home">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    Home
+  </button>
+  <button class="nav-item" data-page="txns">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    Txns
+  </button>
+  <button class="nav-item" data-page="reports">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    Reports
+  </button>
+  <button class="nav-item" data-page="deposit">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+    Deposit
+  </button>
+  <button class="nav-item" data-page="admin">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    Admin
+  </button>
+</nav>
+
+<!-- ══ GLOBAL ══ -->
+<div id="toast"></div>
+<div class="loading-overlay" id="loading-overlay" style="display:none">
+  <span class="spinner dark" style="width:36px;height:36px;border-width:3px"></span>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>

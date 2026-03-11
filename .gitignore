@@ -1,0 +1,5 @@
+# Compiled Go binaries (Netlify builds these)
+netlify/functions/transactions/transactions
+netlify/functions/deposit/deposit
+netlify/functions/reports/reports
+netlify/functions/data/data
